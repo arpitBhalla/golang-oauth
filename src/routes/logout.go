@@ -1,4 +1,4 @@
-package controllers
+package routes
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateUser(userData models.User) error {
+func LoginUser(userData models.User) error {
 	client, err := db.GetMongoClient()
 
 	if err != nil {
@@ -19,7 +19,8 @@ func CreateUser(userData models.User) error {
 
 	collection := client.Database(db.DB).Collection(db.USERS)
 
-	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "uid", Value: userData.Uid}})
+	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: userData.Email}})
+
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
 			_, err = collection.InsertOne(context.TODO(), userData)
