@@ -3,7 +3,7 @@ runtime: go115
 instance_class: F2
 
 env_variables:
-  MONGO_URI: "example-gcs-bucket"
+  MONGO_URI: "mongodb+srv://user:user@mycluster.ddpqc.gcp.mongodb.net"
 
 handlers:
   - url: /.*

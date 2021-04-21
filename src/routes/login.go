@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"gawds/src/db"
+	"gawds/src/models"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -20,6 +21,7 @@ var store = sessions.NewCookieStore([]byte("secretKey"))
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	var user loginBody
+	var loggedUser models.User
 
 	client, connErr := db.GetMongoClient()
 
@@ -47,8 +49,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: user.Email}, primitive.E{Key: "password", Value: user.Password}})
 
 	if res.Err() == nil {
+		res.Decode(&loggedUser)
+
 		session, _ := store.Get(r, "session-name")
-		session.Values["email"] = user.Email
+		session.Values["id"] = loggedUser.Uid
 		err := session.Save(r, w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

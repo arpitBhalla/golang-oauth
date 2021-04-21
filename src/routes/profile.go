@@ -3,16 +3,18 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"gawds/src/db"
 	"gawds/src/models"
 	"net/http"
+	"reflect"
 
-	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func Profile(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	uid, _ := r.Context().Value("id").(string)
+
 	w.WriteHeader(http.StatusOK)
 
 	client, err := db.GetMongoClient()
@@ -29,13 +31,10 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 
 	collection := client.Database(db.DB).Collection(db.USERS)
 
-	filter := bson.D{bson.E{Key: "_id", Value: vars["uid"]}}
-
-	res := collection.FindOne(context.TODO(), filter)
+	res := collection.FindOne(context.TODO(), bson.M{"_id": uid})
 
 	err = res.Decode(&user)
-
-	// return user, err
+	fmt.Println(user, err, reflect.TypeOf(uid))
 
 	if err != nil {
 		json.NewEncoder(w).Encode(Response{
