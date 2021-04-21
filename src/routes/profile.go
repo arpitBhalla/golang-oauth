@@ -3,7 +3,6 @@ package routes
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"gawds/src/db"
 	"gawds/src/models"
 	"net/http"
@@ -14,8 +13,6 @@ import (
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 	uid, _ := r.Context().Value("id").(string)
-
-	// w.WriteHeader(http.StatusOK)
 
 	client, err := db.GetMongoClient()
 
@@ -33,16 +30,14 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 
 	docID, _ := primitive.ObjectIDFromHex(uid)
 
-	res := collection.FindOne(context.TODO(), bson.M{"_id": docID})
+	res := collection.FindOne(context.TODO(), bson.D{bson.E{Key: "_id", Value: docID}})
 
 	err = res.Decode(&user)
-
-	fmt.Println(user, err, (uid))
 
 	if err != nil {
 		json.NewEncoder(w).Encode(Response{
 			Code:    400,
-			Message: "User Not Found",
+			Message: "User Not Logged in",
 		})
 	} else {
 		json.NewEncoder(w).Encode(UserResponse{

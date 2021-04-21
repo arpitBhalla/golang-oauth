@@ -12,9 +12,8 @@ import (
 )
 
 type AllUserResponse struct {
-	Code    int           `json:"code"`
-	Message string        `json:"message"`
-	Result  []models.User `json:"result"`
+	Code   int           `json:"code"`
+	Result []models.User `json:"result"`
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
@@ -57,9 +56,8 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	cur.Close(context.TODO())
 
 	json.NewEncoder(w).Encode(AllUserResponse{
-		Code:    400,
-		Message: "Connection Not Established",
-		Result:  results,
+		Code:   400,
+		Result: results,
 	})
 
 }
