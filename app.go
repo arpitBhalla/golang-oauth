@@ -17,6 +17,7 @@ func main() {
 	r.HandleFunc("/logout", routes.Logout).Methods("POST")
 	r.HandleFunc("/register", routes.Register).Methods("POST")
 	r.HandleFunc("/profile", routes.Profile).Methods("GET")
+	r.HandleFunc("/all", routes.GetAll).Methods("GET")
 
 	r.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusOK)

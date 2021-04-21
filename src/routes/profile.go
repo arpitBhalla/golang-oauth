@@ -7,15 +7,15 @@ import (
 	"gawds/src/db"
 	"gawds/src/models"
 	"net/http"
-	"reflect"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func Profile(w http.ResponseWriter, r *http.Request) {
 	uid, _ := r.Context().Value("id").(string)
 
-	w.WriteHeader(http.StatusOK)
+	// w.WriteHeader(http.StatusOK)
 
 	client, err := db.GetMongoClient()
 
@@ -31,10 +31,13 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 
 	collection := client.Database(db.DB).Collection(db.USERS)
 
-	res := collection.FindOne(context.TODO(), bson.M{"_id": uid})
+	docID, _ := primitive.ObjectIDFromHex(uid)
+
+	res := collection.FindOne(context.TODO(), bson.M{"_id": docID})
 
 	err = res.Decode(&user)
-	fmt.Println(user, err, reflect.TypeOf(uid))
+
+	fmt.Println(user, err, (uid))
 
 	if err != nil {
 		json.NewEncoder(w).Encode(Response{

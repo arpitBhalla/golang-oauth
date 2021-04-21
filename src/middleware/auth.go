@@ -17,8 +17,6 @@ func Middleware(next http.Handler) http.Handler {
 
 		ctx := context.WithValue(r.Context(), "id", strKey)
 
-		// Access context values in handlers like this
-		// props, _ := r.Context().Value("props").(jwt.MapClaims)
 		next.ServeHTTP(w, r.WithContext(ctx))
 
 	})

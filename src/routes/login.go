@@ -52,7 +52,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		res.Decode(&loggedUser)
 
 		session, _ := store.Get(r, "session-name")
-		session.Values["id"] = loggedUser.Uid
+		session.Values["id"] = loggedUser.Uid.String()
 		err := session.Save(r, w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
