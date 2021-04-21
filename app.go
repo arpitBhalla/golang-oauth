@@ -10,7 +10,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/", routes.CreateUser)
-	r.HandleFunc("/products", routes.GetUser)
+	r.HandleFunc("/user", routes.CreateUser).Methods("POST")
+	r.HandleFunc("/user/{key}", routes.GetUser).Methods("GET")
 	http.Handle("/", r)
 }

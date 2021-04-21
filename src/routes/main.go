@@ -5,6 +5,8 @@ import (
 	"gawds/src/controllers"
 	"gawds/src/models"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type response struct {
@@ -43,8 +45,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request, uid string) {
-	user, err := controllers.GetUser(uid)
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	w.WriteHeader(http.StatusOK)
+
+	user, err := controllers.GetUser(vars["uid"])
 
 	if err != nil {
 		json.NewEncoder(w).Encode(response{
