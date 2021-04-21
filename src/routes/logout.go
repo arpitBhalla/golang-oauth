@@ -2,19 +2,29 @@ package routes
 
 import (
 	"context"
+	"encoding/json"
 	"gawds/src/db"
 	"gawds/src/models"
+	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func LoginUser(userData models.User) error {
+func Logout(w http.ResponseWriter, r *http.Request) {
+
+	var (
+		userData models.User
+	)
 	client, err := db.GetMongoClient()
 
 	if err != nil {
-		return err
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: "Connection Not Established",
+		})
+		return
 	}
 
 	collection := client.Database(db.DB).Collection(db.USERS)
@@ -25,25 +35,18 @@ func LoginUser(userData models.User) error {
 		if res.Err() == mongo.ErrNoDocuments {
 			_, err = collection.InsertOne(context.TODO(), userData)
 			if err != nil {
-				return err
+				json.NewEncoder(w).Encode(Response{
+					Code:    400,
+					Message: "err",
+				})
+				return
 			}
 		} else {
-			return res.Err()
-		}
-	} else {
-		var user models.User
-		err = res.Decode(&user)
-		if err != nil {
-			return err
-		}
-		filter := bson.D{primitive.E{Key: "uid", Value: userData.Uid}}
-		updater := bson.D{
-			primitive.E{Key: "$set", Value: userData},
-		}
-		_, err = collection.UpdateOne(context.TODO(), filter, updater)
-		if err != nil {
-			return err
+			json.NewEncoder(w).Encode(Response{
+				Code:    400,
+				Message: "res.Err()",
+			})
+			return
 		}
 	}
-	return nil
 }

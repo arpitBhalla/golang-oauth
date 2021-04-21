@@ -12,7 +12,7 @@ import (
 )
 
 type loginBody struct {
-	Email    int    `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -32,7 +32,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonErr := json.NewDecoder(r.Body).Decode(&user)
+
 	if jsonErr != nil {
+		w.WriteHeader(400)
 		json.NewEncoder(w).Encode(Response{
 			Code:    400,
 			Message: "Invalid Body",
@@ -40,17 +42,27 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, _ := store.Get(r, "session-name")
 	collection := client.Database(db.DB).Collection(db.USERS)
 
-	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: user.Email}})
+	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: user.Email}, primitive.E{Key: "password", Value: user.Password}})
 
-	if res.Err() != nil {
-		session.Values["auth-token"] = ""
+	if res.Err() == nil {
+		session, _ := store.Get(r, "session-name")
+		session.Values["email"] = user.Email
 		err := session.Save(r, w)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		json.NewEncoder(w).Encode(Response{
+			Code:    200,
+			Message: "Login Done",
+		})
+	} else {
+		json.NewEncoder(w).Encode(Response{
+			Code:    200,
+			Message: "Login Failed",
+		})
+		return
 	}
 }

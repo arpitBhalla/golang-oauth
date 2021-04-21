@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"gawds/src/db"
-	"gawds/src/models"
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,47 +11,56 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type newUser struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func Register(w http.ResponseWriter, r *http.Request) {
-	var newUser models.User
+	var newUser newUser
 
 	err := json.NewDecoder(r.Body).Decode(&newUser)
 	if err != nil {
 		json.NewEncoder(w).Encode(Response{
 			Code:    400,
-			Message: err.Error(),
+			Message: "Invalid Body",
 		})
 		return
 	}
 	client, err := db.GetMongoClient()
 
 	if err != nil {
-		return err
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: "Connection Not Established",
+		})
+		return
 	}
 
 	collection := client.Database(db.DB).Collection(db.USERS)
 
 	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: newUser.Email}})
 
-	if res.Err() != nil {
-		if res.Err() == mongo.ErrNoDocuments {
-			_, err = collection.InsertOne(context.TODO(), newUser)
-			if err != nil {
-				return err
-			}
-		} else {
-			return res.Err()
-		}
-	} else {
+	if res.Err() == mongo.ErrNoDocuments {
+		json.NewEncoder(w).Encode(Response{
+			Code:    200,
+			Message: "Success",
+		})
+		_, err = collection.InsertOne(context.TODO(), newUser)
 		if err != nil {
 			json.NewEncoder(w).Encode(Response{
 				Code:    400,
 				Message: err.Error(),
 			})
-		} else {
-			json.NewEncoder(w).Encode(Response{
-				Code:    200,
-				Message: "Success",
-			})
+			return
 		}
+
+	} else {
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: "Already Exists",
+		})
+		return
 	}
 }
