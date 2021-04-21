@@ -2,72 +2,28 @@
 
 ## API
 
-> `Endpoint` https://
+> `Endpoint` https://nitkkr-online.el.r.appspot.com
 
-### Get all users
+### Register
 
-> **`GET` /user**
+> **`POST` /register**
 
-```json
-{
-  "code": "200",
-  "results": [{}]
-}
-```
+<img src="img/signup.png">
 
-### Get user by ID
+### Login
 
-> **`GET` /user/{id}**
+> **`POST` /login**
 
-```json
-{
-  "code": "200",
-  "result": {}
-}
-```
+<img src="img/login.png">
 
-### New User
+### Get Current User
 
-> **`POST` /user**
+> **`GET` /profile**
 
-**Body:**
+### Logout
 
-```json
-{}
-```
+> **`GET` /logout**
 
-**Response:**
+### Get All Users
 
-```json
-{
-  "code": "200",
-  "message": "OK"
-}
-```
-
-### Update User by ID
-
-> **`PUT` /user/{id}**
-
-**Body:**
-
-```json
-{}
-```
-
-**Response:**
-
-```json
-{}
-```
-
-### Delete User by ID
-
-> **`DELETE` /user/{id}**
-
-```json
-{
-  "code": "200",
-  "message": "OK"
-}
-```
+> **`GET` /users**
