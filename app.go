@@ -1,9 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
 
-import "rsc.io/quote"
+	"github.com/gorilla/mux"
+)
 
 func main() {
-    fmt.Println(quote.Go())
+	r := mux.NewRouter()
+	// r.HandleFunc("/", HomeHandler)
+	// r.HandleFunc("/products", ProductsHandler)
+	// r.HandleFunc("/articles", ArticlesHandler)
+	http.Handle("/", r)
 }
