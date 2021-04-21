@@ -3,13 +3,14 @@ package main
 import (
 	"net/http"
 
+	"gawds/src/routes"
+
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	r := mux.NewRouter()
-	// r.HandleFunc("/", HomeHandler)
-	// r.HandleFunc("/products", ProductsHandler)
-	// r.HandleFunc("/articles", ArticlesHandler)
+	r.HandleFunc("/", routes.CreateUser)
+	r.HandleFunc("/products", routes.GetUser)
 	http.Handle("/", r)
 }

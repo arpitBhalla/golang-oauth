@@ -1,4 +1,4 @@
-package routes
+package controllers
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateUser(task models.User) error {
+func CreateUser(userData models.User) error {
 	client, err := db.GetMongoClient()
 
 	if err != nil {
@@ -19,10 +19,10 @@ func CreateUser(task models.User) error {
 
 	collection := client.Database(db.DB).Collection(db.USERS)
 
-	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "uid", Value: task.Uid}})
+	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "uid", Value: userData.Uid}})
 	if res.Err() != nil {
 		if res.Err() == mongo.ErrNoDocuments {
-			_, err = collection.InsertOne(context.TODO(), task)
+			_, err = collection.InsertOne(context.TODO(), userData)
 			if err != nil {
 				return err
 			}
@@ -35,9 +35,9 @@ func CreateUser(task models.User) error {
 		if err != nil {
 			return err
 		}
-		filter := bson.D{primitive.E{Key: "uid", Value: task.Uid}}
+		filter := bson.D{primitive.E{Key: "uid", Value: userData.Uid}}
 		updater := bson.D{
-			primitive.E{Key: "$set", Value: task},
+			primitive.E{Key: "$set", Value: userData},
 		}
 		_, err = collection.UpdateOne(context.TODO(), filter, updater)
 		if err != nil {

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"gawds/src/controllers"
 	"gawds/src/models"
 	"net/http"
 )
@@ -17,7 +18,7 @@ type userResponse struct {
 	Result  models.User `json:"result"`
 }
 
-func newUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var newUser models.User
 
 	err := json.NewDecoder(r.Body).Decode(&newUser)
@@ -28,7 +29,7 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	err = CreateUser(newUser)
+	err = controllers.CreateUser(newUser)
 	if err != nil {
 		json.NewEncoder(w).Encode(response{
 			Code:    400,
@@ -42,8 +43,8 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUser(w http.ResponseWriter, r *http.Request, uid string) {
-	user, err := GetUser(uid)
+func GetUser(w http.ResponseWriter, r *http.Request, uid string) {
+	user, err := controllers.GetUser(uid)
 
 	if err != nil {
 		json.NewEncoder(w).Encode(response{
