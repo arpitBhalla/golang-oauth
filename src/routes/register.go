@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type newUser struct {
@@ -47,6 +48,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			Code:    200,
 			Message: "Success",
 		})
+
+		hash, _ := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.MinCost)
+		newUser.Password = string(hash)
 		_, err = collection.InsertOne(context.TODO(), newUser)
 		if err != nil {
 			json.NewEncoder(w).Encode(Response{

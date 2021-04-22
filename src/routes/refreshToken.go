@@ -10,17 +10,24 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+type Token struct {
+	RefreshToken string `json:"refreshToken"`
+}
+
 func RefreshToken(w http.ResponseWriter, r *http.Request) {
+	var bodyToken Token
 
-	mapToken := map[string]string{}
-	// if err := c.ShouldBindJSON(&mapToken); err != nil {
-	// 	c.JSON(http.StatusUnprocessableEntity, err.Error())
-	// 	return
-	// }
-	refreshToken := mapToken["refresh_token"]
+	err := json.NewDecoder(r.Body).Decode(&bodyToken)
+	if err != nil {
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: "Invalid Body",
+		})
+		return
+	}
+	refreshToken := bodyToken.RefreshToken
 
-	//verify the token
-	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf") //this should be in an env file
+	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf")
 	token, _ := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -47,24 +46,22 @@ func CreateToken(userid string) (*TokenDetails, error) {
 	td.RefreshUuid = td.AccessUuid + "++" + (userid)
 
 	var err error
-	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd")
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["access_uuid"] = td.AccessUuid
 	atClaims["user_id"] = userid
 	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	td.AccessToken, err = at.SignedString([]byte("jdnfksdmfksd"))
 	if err != nil {
 		return nil, err
 	}
-	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf")
 	rtClaims := jwt.MapClaims{}
 	rtClaims["refresh_uuid"] = td.RefreshUuid
 	rtClaims["user_id"] = userid
 	rtClaims["exp"] = td.RtExpires
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
+	td.RefreshToken, err = rt.SignedString([]byte("mcmvmkmsdnfsdmfdsjf"))
 	if err != nil {
 		return nil, err
 	}
@@ -99,11 +96,9 @@ func ExtractToken(r *http.Request) string {
 func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	tokenString := ExtractToken(r)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(os.Getenv("ACCESS_SECRET")), nil
+		return []byte("jdnfksdmfksd"), nil
 	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +123,7 @@ func ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
 		return nil, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
+	print(claims)
 	if ok && token.Valid {
 		accessUuid, ok := claims["access_uuid"].(string)
 		if !ok {

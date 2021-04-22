@@ -10,6 +10,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -40,15 +41,38 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	collection := client.Database(db.DB).Collection(db.USERS)
 
-	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: user.Email}, primitive.E{Key: "password", Value: user.Password}})
+	res := collection.FindOne(context.TODO(), bson.D{primitive.E{Key: "email", Value: user.Email}})
 
 	if res.Err() == nil {
 		res.Decode(&loggedUser)
-		tokens, err := utils.CreateToken(loggedUser.Uid.Hex())
-		err2 := utils.CreateAuth(loggedUser.Uid.Hex(), tokens)
 
-		if err != nil || err2 != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		err := bcrypt.CompareHashAndPassword([]byte(loggedUser.Password), []byte(user.Password))
+
+		if err != nil {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"code":    400,
+				"Message": "Login Failed",
+			})
+			return
+		}
+
+		tokens, err := utils.CreateToken(loggedUser.Uid.Hex())
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"code":    400,
+				"Message": "Unable to create token",
+			})
+			return
+		}
+		redisError := utils.CreateAuth(loggedUser.Uid.Hex(), tokens)
+
+		if redisError != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"code":    400,
+				"Message": "Unable to create token",
+			})
 			return
 		}
 		json.NewEncoder(w).Encode(LoginResponse{
