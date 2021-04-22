@@ -11,11 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type AllUserResponse struct {
-	Code   int           `json:"code"`
-	Result []models.User `json:"result"`
-}
-
 func GetAll(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 

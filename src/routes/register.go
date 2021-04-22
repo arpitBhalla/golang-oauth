@@ -59,7 +59,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	} else {
 		json.NewEncoder(w).Encode(Response{
 			Code:    400,
-			Message: "Already Exists",
+			Message: "User Already Exists",
 		})
 		return
 	}

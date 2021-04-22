@@ -6,11 +6,13 @@ import (
 
 	"gawds/src/middleware"
 	"gawds/src/routes"
+	"gawds/src/utils"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	utils.Init()
 	r := mux.NewRouter()
 	r.Use(middleware.Middleware)
 	r.HandleFunc("/login", routes.Login).Methods("POST")
