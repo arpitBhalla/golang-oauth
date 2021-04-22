@@ -86,19 +86,18 @@ const content: ReadmeContent[] = [
   },
 ];
 
-let md = `# README
+let md = `# API
 
-## API
-
-### Base URL
+## Base URL
 
 > https://nitkkr-online.el.r.appspot.com/
 
-### Authentication Header
+## Authentication Header
 
-> \`Bearer: <Token>\`
+ \`Bearer: <Token>\`
 
-### Endpoints
+## Endpoints
+
 `;
 
 content.forEach((e) => {
@@ -108,12 +107,13 @@ content.forEach((e) => {
 > \`${e.method}\`  **/${e.endpoint}**
 
 ${
-  e.request &&
-  `**Request Body**
+  e.request
+    ? `**Request Body**
 
 \`\`\`json
 ${JSON.stringify(e.request, null, 2)}
 \`\`\``
+    : ""
 }
 
 **Response**

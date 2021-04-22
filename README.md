@@ -1,16 +1,15 @@
-# README
+# API
 
-## API
-
-### Base URL
+## Base URL
 
 > https://nitkkr-online.el.r.appspot.com/
 
-### Authentication Header
+## Authentication Header
 
-> `Bearer: <Token>`
+ `Bearer: <Token>`
 
-### Endpoints
+## Endpoints
+
 
 #### Register
 
@@ -84,7 +83,7 @@
 
 > `POST`  **/logout**
 
-null
+
 
 **Response**
 
@@ -99,7 +98,7 @@ null
 
 > `GET`  **/profile**
 
-null
+
 
 **Response**
 
@@ -113,11 +112,11 @@ null
 ```
 
 
-#### Get your profile
+#### Dump all profile
 
 > `GET`  **/all**
 
-null
+
 
 **Response**
 
