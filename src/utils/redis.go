@@ -8,7 +8,7 @@ import (
 
 var client *redis.Client
 
-func Init() {
+func RedisInit() {
 	dsn := os.Getenv("REDIS_DSN")
 	if len(dsn) == 0 {
 		dsn = "localhost:6379"

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -11,7 +12,24 @@ import (
 	"github.com/twinj/uuid"
 )
 
-type Tokens struct {
+type User struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+var user = User{
+	ID:       1,
+	Username: "username",
+	Password: "password",
+}
+
+type AccessDetails struct {
+	AccessUuid string
+	UserId     string
+}
+
+type TokenDetails struct {
 	AccessToken  string
 	RefreshToken string
 	AccessUuid   string
@@ -20,66 +38,40 @@ type Tokens struct {
 	RtExpires    int64
 }
 
-func ExtractToken(r *http.Request) (*jwt.Token, error) {
+func CreateToken(userid string) (*TokenDetails, error) {
+	td := &TokenDetails{}
+	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+	td.AccessUuid = uuid.NewV4().String()
 
-	bearToken := r.Header.Get("Authorization")
-
-	tokenString := strings.Split(bearToken, " ")
-
-	tokenValue := ""
-	if len(tokenString) == 2 {
-		tokenValue = tokenString[1]
-
-		token, err := jwt.Parse(tokenValue, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return "ACCESS_SECRET", nil
-		})
-		if err != nil {
-			return nil, err
-		}
-		return token, nil
-	} else {
-		return nil, errors.New("Unauthenticated")
-	}
-}
-
-func CreateToken(userid string) (*Tokens, error) {
-	tokenData := &Tokens{}
-	tokenData.AtExpires = time.Now().Add(time.Minute * 15).Unix()
-	tokenData.AccessUuid = uuid.NewV4().String()
-
-	tokenData.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	tokenData.RefreshUuid = uuid.NewV4().String()
-	print(80)
+	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	td.RefreshUuid = td.AccessUuid + "++" + (userid)
 
 	var err error
+	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd")
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
-	atClaims["access_uuid"] = tokenData.AccessUuid
+	atClaims["access_uuid"] = td.AccessUuid
 	atClaims["user_id"] = userid
-	atClaims["exp"] = tokenData.AtExpires
+	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	tokenData.AccessToken, err = at.SignedString([]byte("accessSecret"))
+	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 	if err != nil {
-		print(err.Error())
 		return nil, err
 	}
-
+	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf")
 	rtClaims := jwt.MapClaims{}
-	rtClaims["refresh_uuid"] = tokenData.RefreshUuid
+	rtClaims["refresh_uuid"] = td.RefreshUuid
 	rtClaims["user_id"] = userid
-	rtClaims["exp"] = tokenData.RtExpires
+	rtClaims["exp"] = td.RtExpires
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	tokenData.RefreshToken, err = rt.SignedString([]byte("tokenSecret"))
+	td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
 	if err != nil {
 		return nil, err
 	}
-	return tokenData, nil
+	return td, nil
 }
 
-func CreateAuth(userid string, td *Tokens) error {
+func CreateAuth(userid string, td *TokenDetails) error {
 	at := time.Unix(td.AtExpires, 0)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
@@ -94,10 +86,96 @@ func CreateAuth(userid string, td *Tokens) error {
 	}
 	return nil
 }
-func DeleteAuth(givenUuid string) (int64, error) {
-	deleted, err := client.Del(givenUuid).Result()
+
+func ExtractToken(r *http.Request) string {
+	bearToken := r.Header.Get("Authorization")
+	strArr := strings.Split(bearToken, " ")
+	if len(strArr) == 2 {
+		return strArr[1]
+	}
+	return ""
+}
+
+func VerifyToken(r *http.Request) (*jwt.Token, error) {
+	tokenString := ExtractToken(r)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("ACCESS_SECRET")), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return token, nil
+}
+
+func TokenValid(r *http.Request) error {
+	token, err := VerifyToken(r)
+	if err != nil {
+		return err
+	}
+	if _, ok := token.Claims.(jwt.Claims); !ok || !token.Valid {
+		return err
+	}
+	return nil
+}
+
+func ExtractTokenMetadata(r *http.Request) (*AccessDetails, error) {
+	token, err := VerifyToken(r)
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		accessUuid, ok := claims["access_uuid"].(string)
+		if !ok {
+			return nil, err
+		}
+		if err != nil {
+			return nil, err
+		}
+		return &AccessDetails{
+			AccessUuid: accessUuid,
+			UserId:     claims["user_id"].(string),
+		}, nil
+	}
+	return nil, err
+}
+
+func FetchAuth(authD *AccessDetails) (string, error) {
+	userID, err := client.Get(authD.AccessUuid).Result()
+	if err != nil {
+		return "", err
+	}
+	if authD.UserId != userID {
+		return "", errors.New("unauthorized")
+	}
+	return userID, nil
+}
+
+func DeleteAuth(givenUuid string) (int, error) {
+	_, err := client.Del(givenUuid).Result()
 	if err != nil {
 		return 0, err
 	}
-	return deleted, nil
+	return 1, nil
+}
+
+func DeleteTokens(authD *AccessDetails) error {
+
+	refreshUuid := fmt.Sprintf("%s++%d", authD.AccessUuid, authD.UserId)
+	deletedAt, err := client.Del(authD.AccessUuid).Result()
+	if err != nil {
+		return err
+	}
+	deletedRt, err := client.Del(refreshUuid).Result()
+	if err != nil {
+		return err
+	}
+	if deletedAt != 1 || deletedRt != 1 {
+		return errors.New("something went wrong")
+	}
+	return nil
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	utils.Init()
+	utils.RedisInit()
 	r := mux.NewRouter()
 	r.Use(middleware.Middleware)
 	r.HandleFunc("/login", routes.Login).Methods("POST")
