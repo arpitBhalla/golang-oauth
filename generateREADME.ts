@@ -7,6 +7,7 @@ type ReadmeContent = {
   request: {};
   response: {};
 };
+const BASEURL = "https://nitkkr-online.el.r.appspot.com/";
 
 const content: ReadmeContent[] = [
   {
@@ -86,11 +87,15 @@ const content: ReadmeContent[] = [
   },
 ];
 
-let md = `# API
+let md = `# OAuth2.0 API
+
+- **Golang**
+- **MongoDB** for storing data
+- **Redis** to Store JWT Metadata
 
 ## Base URL
 
-> https://nitkkr-online.el.r.appspot.com/
+${BASEURL}
 
 ## Authentication Header
 
@@ -102,9 +107,9 @@ let md = `# API
 
 content.forEach((e) => {
   md += `
-#### ${e.name}
+### **${e.name}**
 
-> \`${e.method}\`  **/${e.endpoint}**
+> **\`${e.method}\`**  [**/${e.endpoint}**](${BASEURL}/${e.endpoint})
 
 ${
   e.request

@@ -1,8 +1,12 @@
-# API
+# OAuth2.0 API
+
+- **Golang**
+- **MongoDB** for storing data
+- **Redis** to Store JWT Metadata
 
 ## Base URL
 
-> https://nitkkr-online.el.r.appspot.com/
+https://nitkkr-online.el.r.appspot.com/
 
 ## Authentication Header
 
@@ -11,9 +15,9 @@
 ## Endpoints
 
 
-#### Register
+### **Register**
 
-> `POST`  **/register**
+> **`POST`**  [**/register**](https://nitkkr-online.el.r.appspot.com//register)
 
 **Request Body**
 
@@ -34,9 +38,9 @@
 ```
 
 
-#### Login
+### **Login**
 
-> `POST`  **/login**
+> **`POST`**  [**/login**](https://nitkkr-online.el.r.appspot.com//login)
 
 **Request Body**
 
@@ -58,9 +62,9 @@
 ```
 
 
-#### Refresh Token
+### **Refresh Token**
 
-> `POST`  **/refresh**
+> **`POST`**  [**/refresh**](https://nitkkr-online.el.r.appspot.com//refresh)
 
 **Request Body**
 
@@ -79,9 +83,9 @@
 ```
 
 
-#### Logout
+### **Logout**
 
-> `POST`  **/logout**
+> **`POST`**  [**/logout**](https://nitkkr-online.el.r.appspot.com//logout)
 
 
 
@@ -94,9 +98,9 @@
 ```
 
 
-#### Get your profile
+### **Get your profile**
 
-> `GET`  **/profile**
+> **`GET`**  [**/profile**](https://nitkkr-online.el.r.appspot.com//profile)
 
 
 
@@ -112,9 +116,9 @@
 ```
 
 
-#### Dump all profile
+### **Dump all profile**
 
-> `GET`  **/all**
+> **`GET`**  [**/all**](https://nitkkr-online.el.r.appspot.com//all)
 
 
 
