@@ -1,14 +1,25 @@
-version: "2"
+version: "3"
+
 services:
   app:
-    image: golang:1.6.1-alpine
-    volumes:
-      - .:/go/src/go-with-compose
-    working_dir: /go/src/go-with-compose
-    command: go run main.go
-    links:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
       - redis
     environment:
       REDIS_URL: redis:6379
+    networks:
+      - backend
+
   redis:
-    image: redis:alpine
+    image: "redis:alpine"
+    restart: unless-stopped
+    networks:
+      - backend
+
+networks:
+  backend:
