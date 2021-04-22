@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"gawds/src/db"
-	"gawds/src/models"
 	"log"
 	"net/http"
 
@@ -12,7 +11,16 @@ import (
 )
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+	uid, _ := r.Context().Value("id").(string)
+
+	if uid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(Response{
+			Code:    401,
+			Message: "Unauthorized",
+		})
+		return
+	}
 
 	client, err := db.GetMongoClient()
 
@@ -30,11 +38,11 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var results []models.User
+	var results []UserData
 
 	for cur.Next(context.TODO()) {
 
-		var elem models.User
+		var elem UserData
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)

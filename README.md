@@ -1,4 +1,4 @@
-# Gawds Auth Golang
+# README
 
 ## API
 
@@ -6,50 +6,131 @@
 
 > https://nitkkr-online.el.r.appspot.com/
 
+### Authentication Header
+
+> `Bearer: <Token>`
+
 ### Endpoints
 
 #### Register
 
-> **`POST` /register**
+> `POST`  **/register**
 
-<img src="img/register.png">
+**Request Body**
 
-#### Login
-
-> **`POST` /login**
-
-<img src="img/login.png">
-
-#### Get Current User
-
-> **`GET` /profile**
-
-<img src="img/profile.png">
-
-#### Logout
-
-> **`POST` /logout**
-
-<img src="img/logout.png">
-
-#### Get All Users
-
-> **`GET` /all**
-
-<img src="img/all.png">
+```json
+{
+  "name": "YOUR NAME",
+  "email": "EMAIL",
+  "password": "PASSWORD"
+}
+```
 
 **Response**
 
 ```json
 {
-  "code": 400,
-  "result": [
+  "code": 200
+}
+```
+
+
+#### Login
+
+> `POST`  **/login**
+
+**Request Body**
+
+```json
+{
+  "email": "EMAIL",
+  "password": "PASSWORD"
+}
+```
+
+**Response**
+
+```json
+{
+  "code": 200,
+  "accessToken": "JWT TOKEN",
+  "refreshToken": "JWT TOKEN"
+}
+```
+
+
+#### Refresh Token
+
+> `POST`  **/refresh**
+
+**Request Body**
+
+```json
+{
+  "refreshToken": "JWT TOKEN"
+}
+```
+
+**Response**
+
+```json
+{
+  "accessToken": "JWT TOKEN"
+}
+```
+
+
+#### Logout
+
+> `POST`  **/logout**
+
+null
+
+**Response**
+
+```json
+{
+  "code": 200
+}
+```
+
+
+#### Get your profile
+
+> `GET`  **/profile**
+
+null
+
+**Response**
+
+```json
+{
+  "code": 200,
+  "_id": "MONGODB ID",
+  "name": "NAME",
+  "email": "EMAIL"
+}
+```
+
+
+#### Get your profile
+
+> `GET`  **/all**
+
+null
+
+**Response**
+
+```json
+{
+  "code": 200,
+  "data": [
     {
-      "_id": "60803df858302ce4992142bb",
-      "name": "Arpit Bhalla",
-      "email": "arpitbhalla2001@gmail.com",
-      "password": "demo1234"
+      "_id": "MONGODB ID",
+      "name": "NAME",
+      "email": "EMAIL"
     }
   ]
 }
 ```
+

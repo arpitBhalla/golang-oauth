@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"gawds/src/db"
-	"gawds/src/models"
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,9 +13,18 @@ import (
 func Profile(w http.ResponseWriter, r *http.Request) {
 	uid, _ := r.Context().Value("id").(string)
 
+	if uid == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(Response{
+			Code:    401,
+			Message: "Unauthorized",
+		})
+		return
+	}
+
 	client, err := db.GetMongoClient()
 
-	var user models.User
+	var user UserData
 
 	if err != nil {
 		json.NewEncoder(w).Encode(Response{

@@ -29,24 +29,28 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf")
 	token, _ := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("REFRESH_SECRET")), nil
 	})
-	//if there is an error, the token must have expired
-	// if err != nil {
-	// 	fmt.Println("the error: ", err)
-	// 	c.JSON(http.StatusUnauthorized, "Refresh token expired")
-	// 	return
-	// }
-	// //is token valid?
-	// if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
-	// 	c.JSON(http.StatusUnauthorized, err)
-	// 	return
-	// }
-	//Since token is valid, get the uuid:
+	if err != nil {
+		fmt.Println("the error: ", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: "Refresh token expired",
+		})
+		return
+	}
+	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: err.Error(),
+		})
+		return
+	}
 	claims, ok := token.Claims.(jwt.MapClaims) //the token claims should conform to MapClaims
 	if ok && token.Valid {
 		refreshUuid, ok := claims["refresh_uuid"].(string) //convert the interface to string
