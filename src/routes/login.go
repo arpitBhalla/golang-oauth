@@ -8,6 +8,7 @@ import (
 	"gawds/src/utils"
 	"net/http"
 
+	"github.com/softbrewery/gojoi/pkg/joi"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -18,6 +19,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var loggedUser models.User
 
 	client, connErr := db.GetMongoClient()
+
+	emailError := joi.Validate(user.Email, joi.String().Email(nil))
+	passwordError := joi.Validate(user.Password, joi.String().Min(6))
+
+	if emailError != nil || passwordError != nil {
+		json.NewEncoder(w).Encode(Response{
+			Code:    400,
+			Message: "Invalid Body with error(s):" + emailError.Error() + passwordError.Error(),
+		})
+		return
+	}
 
 	if connErr != nil {
 		w.WriteHeader(http.StatusBadGateway)
@@ -71,7 +83,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"code":    400,
-				"Message": "Unable to create token",
+				"Message": "Unable to save token",
 			})
 			return
 		}
