@@ -12,6 +12,7 @@ services:
       - redis
     environment:
       REDIS_DSN: redis:6379
+      MONGO_URI: "mongodb+srv://user:user@mycluster.ddpqc.gcp.mongodb.net"
     networks:
       - backend
 
