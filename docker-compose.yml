@@ -6,12 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "80:8080"
     restart: unless-stopped
     depends_on:
       - redis
     environment:
-      REDIS_URL: redis:6379
+      REDIS_DSN: redis:6379
     networks:
       - backend
 

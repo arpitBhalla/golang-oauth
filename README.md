@@ -6,7 +6,7 @@
 
 ## Base URL
 
-https://nitkkr-online.el.r.appspot.com/
+http://34.69.239.180
 
 ## Authentication Header
 
@@ -17,7 +17,7 @@ https://nitkkr-online.el.r.appspot.com/
 
 ### **Register**
 
-> **`POST`**  [**/register**](https://nitkkr-online.el.r.appspot.com//register)
+> **`POST`**  [**/register**](http://34.69.239.180/register)
 
 **Request Body**
 
@@ -40,7 +40,7 @@ https://nitkkr-online.el.r.appspot.com/
 
 ### **Login**
 
-> **`POST`**  [**/login**](https://nitkkr-online.el.r.appspot.com//login)
+> **`POST`**  [**/login**](http://34.69.239.180/login)
 
 **Request Body**
 
@@ -64,7 +64,7 @@ https://nitkkr-online.el.r.appspot.com/
 
 ### **Refresh Token**
 
-> **`POST`**  [**/refresh**](https://nitkkr-online.el.r.appspot.com//refresh)
+> **`POST`**  [**/refresh**](http://34.69.239.180/refresh)
 
 **Request Body**
 
@@ -85,7 +85,7 @@ https://nitkkr-online.el.r.appspot.com/
 
 ### **Logout**
 
-> **`POST`**  [**/logout**](https://nitkkr-online.el.r.appspot.com//logout)
+> **`POST`**  [**/logout**](http://34.69.239.180/logout)
 
 
 
@@ -100,7 +100,7 @@ https://nitkkr-online.el.r.appspot.com/
 
 ### **Get your profile**
 
-> **`GET`**  [**/profile**](https://nitkkr-online.el.r.appspot.com//profile)
+> **`GET`**  [**/profile**](http://34.69.239.180/profile)
 
 
 
@@ -118,7 +118,7 @@ https://nitkkr-online.el.r.appspot.com/
 
 ### **Dump all profile**
 
-> **`GET`**  [**/all**](https://nitkkr-online.el.r.appspot.com//all)
+> **`GET`**  [**/all**](http://34.69.239.180/all)
 
 
 

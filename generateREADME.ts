@@ -7,7 +7,7 @@ type ReadmeContent = {
   request: {};
   response: {};
 };
-const BASEURL = "https://nitkkr-online.el.r.appspot.com/";
+const BASEURL = "http://34.69.239.180";
 
 const content: ReadmeContent[] = [
   {
