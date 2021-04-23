@@ -22,9 +22,17 @@ func main() {
 	r.HandleFunc("/refresh", routes.RefreshToken).Methods("POST")
 	r.HandleFunc("/all", routes.GetAll).Methods("GET")
 
-	r.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		rw.WriteHeader(http.StatusOK)
-		rw.Write([]byte("Server Running"))
+	r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Route Not Found"))
+	})
+	r.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte("Method Not Allowed"))
+	})
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Server Running"))
 	})
 	log.Println("Server Stated")
 
